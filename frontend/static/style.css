@@ -1,0 +1,108 @@
+body{
+    background-color: rgb(240, 240, 240);
+    font-family: sans-serif;
+}
+.main{
+    min-height: 92vh;
+    /* background-color: pink; */
+}
+.main-1{
+    width: 15%;
+    margin-right: 0.5%;
+    min-height: 92.5vh;
+    background-color: white;
+    border-bottom: 1px solid rgb(231, 231, 231);
+
+
+}
+
+.main-2{
+    width: 60%;
+    overflow-y: scroll;
+    background-color: white; /* Color of the scrollbar thumb */
+
+}
+.main-3{
+    width: 24% ;
+    margin-left: 0.5%;
+    background-color: white; /* Color of the scrollbar thumb */
+
+
+}
+.main-1-header{
+    font-size: 20px;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+.main-2-1{
+    min-height: 70%;
+    margin-bottom: 1%;
+    background-color: rgb(245, 245, 245);
+
+}
+.main-2-2{
+    height: 60%;
+    background-color: rgb(245, 245, 245);
+    
+}
+::-webkit-scrollbar {
+    width: 0px; /* Width of the scrollbar */
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent; /* Background color of the scrollbar track */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: white; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners */
+    border: 2px solid rgb(255, 255, 255); /* Space around the scrollbar thumb */
+  }
+  .navbar{
+    background-color: white;
+    border-bottom: 1px solid rgb(231, 231, 231);
+
+  }
+  .list-group-item{
+    border: none;
+    font-size: 14px;
+    
+    color: rgb(32, 32, 32);
+
+  }
+  .list-group-item-1{
+    border: 1px solid rgb(175, 175, 175);
+    list-style: none;cursor: pointer;
+
+    border-radius: 5px; 
+  }
+  .fa-eye-low-vision{
+    color: rgb(56, 190, 173);
+  }
+  .fa-gauge,.fa-bars-progress{
+    font-size: 14px;
+    color: rgb(32, 32, 32);
+  }
+  .main-3-header{
+    font-size: 30px;
+    font-family: sans-serif;
+    font-weight: bold;
+    /* text-align: center; */
+    padding-top: 50px;
+  }
+.image{
+  width: 650px;
+  height: 450px;
+  margin-top: 20px;
+}
+.tablheead{
+  font-size: 14px;
+  background-color: rgb(209, 209, 209);
+}
+td{
+  font-size: 14px;
+}
+tr{
+  font-size: 14px;
+
+}
+

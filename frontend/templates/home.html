@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YOLO Live Detection</title>
+</head>
+<body>
+    <h1>Live YOLO Detection</h1>
+    <video id="video" autoplay muted></video>
+    <canvas id="canvas"></canvas>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const socket = new WebSocket('ws://127.0.0.1:8000/ws');
+
+        // Access camera feed
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                video.play();
+
+                const capture = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = canvas.toDataURL('image/jpeg');
+                    socket.send(imageData);
+                };
+
+                setInterval(capture, 100); // Capture every 100ms
+            })
+            .catch(err => console.error('Error accessing camera:', err));
+
+        // Display results
+        socket.onmessage = event => {
+            const img = new Image();
+            img.src = `data:image/jpeg;base64,${event.data}`;
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+        };
+    </script>
+</body>
+</html>
