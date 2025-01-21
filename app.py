@@ -29,6 +29,7 @@ while True:
         
         if class_name in alert_classes:
             print(f"Alert! Detected: {class_name}")
+            # sleep(10)
             threading.Thread(target=play_alarm, daemon=True).start()
 
     annotated_frame = result.plot() 

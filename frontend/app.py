@@ -13,11 +13,14 @@ from typing import List
 import datetime
 from database import Base, engine
 from sqlalchemy.sql import func
+from playsound import playsound
+import threading
 
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+cap = cv2.VideoCapture(0)
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -33,41 +36,63 @@ model = YOLO("../model/best5.pt")
 class_name = ['Drinking', 'Eating', 'Violence', 'Sleeping', 'Smoking', 'Walking', 'Weapon']
 
 
+
+def play_alarm():
+    playsound('../alram/alram.mp3')
+
+
 @app.get("/")
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.post("/predict")
-async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    contents = await file.read()
-    np_array = np.frombuffer(contents, np.uint8)
-    image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
 
-    results = model(image)
+alert_classes = ['Violence', 'Smoking', 'Weapon']
 
-    for result in results:
-        for box in result.boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            confidence = box.conf[0]
-            label = box.cls[0]
+def generate_frames():
+    while True:
+        ret, video = cap.read()
+        if not ret:
+            break
+        results = model(video)
+        annotated_frame = results[0].plot()
 
-            db_prediction = prediction(
-                name=class_name[int(label)],
-                accuracy=f"{confidence:.2f}",
-                time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            )
-            db.add(db_prediction)
-            db.commit()
+        for box in results[0].boxes:
+            cls = int(box.cls)
+            class_name = model.names[cls]
+            
+            if class_name in alert_classes:
+                print(f"Alert! Detected: {class_name}")
+                threading.Thread(target=play_alarm, daemon=True).start()
 
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(
-                image, f"{class_name[int(label)]} {confidence:.2f}", (x1, y1 - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2
-            )
 
-    _, buffer = cv2.imencode(".jpg", image)
-    return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/jpeg")
+        ret, buffer = cv2.imencode('.jpg', annotated_frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+@app.get("/video_feed")
+def video_feed():
+    return StreamingResponse(generate_frames(), media_type='multipart/x-mixed-replace; boundary=frame')
+
+
+
+@app.get("/start_video")
+def start_video():
+    global cap
+    if not cap.isOpened():
+        cap = cv2.VideoCapture(0)
+    return {"message": "Video started"}
+
+@app.get("/stop_video")
+def stop_video():
+    global cap
+    if cap.isOpened():
+        cap.release()
+    return {"message": "Video stopped"}
+
+
 
 
 from pydantic import BaseModel
@@ -95,3 +120,9 @@ async def get_class_counts(db: Session = Depends(get_db)):
         .all()
     )
     return [{"name": name, "count": count} for name, count in counts]
+
+
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
