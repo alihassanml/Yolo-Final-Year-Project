@@ -77,8 +77,10 @@ async def generate_frames(db: Session):
         for box in results[0].boxes:
             cls = int(box.cls)
             class_name = model.names[cls]
+
             if class_name in alert_classes:
                 print(f"Alert! Detected: {class_name}")
+                threading.Thread(target=play_alarm, daemon=True).start()
         
         for result in results:
             for box in result.boxes:

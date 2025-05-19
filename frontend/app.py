@@ -63,7 +63,7 @@ def generate_frames():
             
             if class_name in alert_classes:
                 print(f"Alert! Detected: {class_name}")
-                # threading.Thread(target=play_alarm, daemon=True).start()
+                threading.Thread(target=play_alarm, daemon=True).start()
 
 
         ret, buffer = cv2.imencode('.jpg', annotated_frame)

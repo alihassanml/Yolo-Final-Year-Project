@@ -1,5 +1,7 @@
 
 # YOLO-Based Object Detection with FastAPI - Final Year Project
+![image](frontend.png)
+![image2](./predict/drinking.png)
 
 This project is a YOLO (You Only Look Once) object detection system built using FastAPI. It provides real-time predictions and visualizations, leveraging the YOLO model for detecting specific activities or objects. This project is developed for a final-year academic project.
 
